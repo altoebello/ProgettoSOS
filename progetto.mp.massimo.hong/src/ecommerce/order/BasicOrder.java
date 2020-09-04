@@ -41,17 +41,8 @@ public class BasicOrder implements Order{
 	}
 	
 	public void updateProductStock() {
-		/*Iterator<Product> iterator = productList.iterator();
-		while(iterator.hasNext()) {
-			Product current = iterator.next();
-			current.updateStock();
-		}*/
-		
 		for ( Map.Entry<Product,Integer> entry : products.entrySet()) {
-			entry.getKey().updateStock(entry.getValue());
-			/*for(int i= 0;i<entry.getValue();i++) {
-				
-			}*/	   
+			entry.getKey().updateStock(entry.getValue()); 
 		}
 	}
 	

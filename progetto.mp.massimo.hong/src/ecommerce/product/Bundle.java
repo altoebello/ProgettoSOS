@@ -40,19 +40,11 @@ public class Bundle extends Product{
 		for ( Map.Entry<Product,Integer> entry : listOfProduct.entrySet()) {
 			  totalCost += entry.getKey().getPrice() * entry.getValue();
 		}
-		/*Iterator<Product> iterator = listOfProduct.iterator();
-		while(iterator.hasNext()) {
-			Product current = iterator.next();
-			totalCost += current.getPrice();
-		}*/
+	
 		return totalCost;
 	}
 	public boolean replenishStock(int quantity) {
-		/*Iterator<Product> iterator = listOfProduct.iterator();
-		while(iterator.hasNext()) {
-			Product current = iterator.next();
-			current.updateStock();
-		}*/
+	
 		if(quantity <= 0)
 			return false;
 		listOfProduct.entrySet().stream().forEach(p -> p.getKey().replenishStock(quantity));
@@ -61,22 +53,15 @@ public class Bundle extends Product{
 	
 	@Override
 	public void updateStock(int quantity) {
-		/*Iterator<Product> iterator = listOfProduct.iterator();
-		while(iterator.hasNext()) {
-			Product current = iterator.next();
-			current.updateStock();
-		}*/
 		for(int i = 0; i<quantity;i++) {
 			listOfProduct.entrySet().stream().forEach(p -> p.getKey().updateStock(p.getValue()));
-		}
-		
+		}	
 	}
 
 	@Override
 	public int getStock() {
-		//return listOfProduct.values().stream().min((a,b)->a-b).orElse(0);
-		Product p =  listOfProduct.keySet().stream().min((a,b) -> a.getStock()/listOfProduct.get(a)-b.getStock()/listOfProduct.get(b)).orElse(null);
-		return p.getStock()/listOfProduct.get(p);
+		 return  listOfProduct.keySet().stream().mapToInt(p -> p.getStock()/listOfProduct.get(p))
+				.min().orElse(0);
 	}
 	
 
