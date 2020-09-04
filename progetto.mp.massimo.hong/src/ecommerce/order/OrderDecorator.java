@@ -3,6 +3,7 @@ package ecommerce.order;
 import ecommerce.Order;
 import ecommerce.Product;
 import ecommerce.Spedition;
+import ecommerce.exception.ProductNotAvailableException;
 
 public abstract class OrderDecorator implements Order{
 	private Order order;
@@ -23,7 +24,7 @@ public abstract class OrderDecorator implements Order{
 		order.updateProductStock();		
 	}
 	@Override
-	public void addProduct(Product product,int quantity) {
+	public void addProduct(Product product,int quantity)throws ProductNotAvailableException {
 		order.addProduct(product,quantity);
 		
 	}

@@ -11,10 +11,10 @@ public class AbsoluteDiscount extends OrderDecorator{
 	}
 	
 	public double getOrderCost() {
-		return super.getOrderCost()-discountAmount;
+		double cost = super.getOrderCost();
+		if(discountAmount > cost)
+			return 0;
+		return cost-discountAmount;
 	}
-	
 
-	
-	
 }

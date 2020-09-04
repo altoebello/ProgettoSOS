@@ -1,19 +1,19 @@
 package ecommerce.order;
 
-import java.util.ArrayList;
-import java.util.List;
 
+import java.util.HashMap;
+import java.util.Map;
 import ecommerce.Customer;
 import ecommerce.Order;
 import ecommerce.Product;
 import ecommerce.Spedition;
+import ecommerce.exception.ProductNotAvailableException;
 
 public class BasicOrder implements Order{
 	
-	private List<Product> productList = new ArrayList<>();
 	private Spedition spedition;
 	private Customer customer;
-	
+	private Map<Product,Integer> products = new HashMap<>();
 	public BasicOrder(Spedition speditionType,Customer customer) {
 		this.spedition = speditionType;
 		this.customer = customer;
@@ -22,16 +22,20 @@ public class BasicOrder implements Order{
 	
 	public double getOrderCost() {
 		double totalCost = 0;
-		for(Product p : productList)
-			totalCost += p.getPrice();
+		for ( Map.Entry<Product,Integer> entry : products.entrySet()) {
+			  totalCost += entry.getKey().getPrice() * entry.getValue();
+		}
 		return totalCost + spedition.getSpeditionCost();
 	}
 	
 	
-	public void addProduct(Product product,int quantity) {
-		for(int i = 0; i<quantity;i++) {
-			productList.add(product);
-		}
+	public void addProduct(Product product,int quantity) throws ProductNotAvailableException {
+		
+		quantity += products.getOrDefault(product, 0);
+		int remainingStock = product.getStock();
+		if(quantity > remainingStock)
+			throw new ProductNotAvailableException("Product has : "+ remainingStock +" while you requested : "+quantity);
+		products.put(product, quantity);
 		product.addObserver(customer);
 			
 	}
@@ -42,11 +46,17 @@ public class BasicOrder implements Order{
 			Product current = iterator.next();
 			current.updateStock();
 		}*/
-		productList.stream().forEach(p -> p.updateStock());
+		
+		for ( Map.Entry<Product,Integer> entry : products.entrySet()) {
+			entry.getKey().updateStock(entry.getValue());
+			/*for(int i= 0;i<entry.getValue();i++) {
+				
+			}*/	   
+		}
 	}
 	
 	public void removeProduct(Product product) {
-		productList.removeIf(p -> p.equals(product));
+		products.remove(product);
 	}
 
 

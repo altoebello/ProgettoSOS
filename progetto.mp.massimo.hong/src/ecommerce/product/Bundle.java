@@ -1,24 +1,32 @@
 package ecommerce.product;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import ecommerce.Product;
+import ecommerce.exception.ProductNotAvailableException;
 
 public class Bundle extends Product{
 	
 	public Bundle(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
+	
 	}
 
-	private List<Product> listOfProduct = new ArrayList<>();
+	private Map<Product,Integer> listOfProduct = new HashMap<>();
 	
 
 	@Override
-	public void addProduct(Product product) throws UnsupportedOperationException {
-		listOfProduct.add(product);	
+	public void addProduct(Product product,int quantity) throws UnsupportedOperationException, ProductNotAvailableException {
+		quantity += listOfProduct.getOrDefault(product, 0);
+		
+		int remainingStock = product.getStock();
+		
+		if(quantity > remainingStock)
+			throw new ProductNotAvailableException("Product has : "+ remainingStock +" while you requested : "+quantity);
+		listOfProduct.put(product,quantity);	
 	}
 
 	@Override
@@ -28,35 +36,49 @@ public class Bundle extends Product{
 	
 	public double getPrice() {
 		double totalCost = 0;
-		Iterator<Product> iterator = listOfProduct.iterator();
+		
+		for ( Map.Entry<Product,Integer> entry : listOfProduct.entrySet()) {
+			  totalCost += entry.getKey().getPrice() * entry.getValue();
+		}
+		/*Iterator<Product> iterator = listOfProduct.iterator();
 		while(iterator.hasNext()) {
 			Product current = iterator.next();
 			totalCost += current.getPrice();
-		}
+		}*/
 		return totalCost;
 	}
-	public void replenishStock(int quantity) {
+	public boolean replenishStock(int quantity) {
 		/*Iterator<Product> iterator = listOfProduct.iterator();
 		while(iterator.hasNext()) {
 			Product current = iterator.next();
 			current.updateStock();
 		}*/
-		listOfProduct.stream().forEach(p -> p.replenishStock(quantity));
+		if(quantity <= 0)
+			return false;
+		listOfProduct.entrySet().stream().forEach(p -> p.getKey().replenishStock(quantity));
+		return true;
 	}
+	
 	@Override
-	public void updateStock() {
+	public void updateStock(int quantity) {
 		/*Iterator<Product> iterator = listOfProduct.iterator();
 		while(iterator.hasNext()) {
 			Product current = iterator.next();
 			current.updateStock();
 		}*/
-		listOfProduct.stream().forEach(p -> p.updateStock());
+		for(int i = 0; i<quantity;i++) {
+			listOfProduct.entrySet().stream().forEach(p -> p.getKey().updateStock(p.getValue()));
+		}
+		
 	}
 
 	@Override
 	public int getStock() {
-		return 0;
-		//
+		//return listOfProduct.values().stream().min((a,b)->a-b).orElse(0);
+		Product p =  listOfProduct.keySet().stream().min((a,b) -> a.getStock()/listOfProduct.get(a)-b.getStock()/listOfProduct.get(b)).orElse(null);
+		return p.getStock()/listOfProduct.get(p);
 	}
+	
+
 
 }

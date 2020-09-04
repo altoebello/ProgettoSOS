@@ -12,7 +12,7 @@ public class PremiumSpedition implements Spedition{
 	
 	@Override
 	public double getSpeditionCost() {
-		// TODO Auto-generated method stub
+		
 		return speditionCost;
 	}
 	

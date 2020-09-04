@@ -10,6 +10,10 @@ public class SingleProduct extends Product{
 	
 	public SingleProduct(String productName, double price, int stock) {
 		super(productName);
+		if(price <= 0 )
+			throw new IllegalArgumentException("Price must be positive");
+		if(stock <= 0)
+			throw new IllegalArgumentException("Stock must be positive");
 		this.price = price;
 		this.stock = stock;
 	}
@@ -18,15 +22,17 @@ public class SingleProduct extends Product{
 		return price;
 	}
 	
-	public void replenishStock(int quantity) {
+	public boolean replenishStock(int quantity) {
+		if(quantity <= 0)
+			return false;
 		if(stock == 0)
 			notifyAllObservers(super.getProductName() + " has been replenished");
 		this.stock += quantity;
-		
+		return true;
 	}
 	
-	public void updateStock() {
-		this.stock --;
+	public void updateStock(int quantity) {
+		stock = stock - quantity;
 		if(stock == 0)
 			notifyAllObservers(getProductName() + " has 0 stock!");
 	}
@@ -36,9 +42,8 @@ public class SingleProduct extends Product{
 	}
 	
 	
-
 	@Override
-	public void addProduct(Product product) throws UnsupportedOperationException {
+	public void addProduct(Product product,int quantity) throws UnsupportedOperationException {
 		throw new UnsupportedOperationException("Operation not allowed in leaf");
 		
 	}
